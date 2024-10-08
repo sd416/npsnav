@@ -35,6 +35,37 @@
     {% include 'footer.html' %}
     
     <script src="/assets/js/script.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get all table cells in the returns columns (assuming they are the 3rd to 10th columns)
+            const table = document.getElementById('fundTable');
+            const rows = table.getElementsByTagName('tr');
+        
+            // Loop through each row (skip the header row)
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                // Loop through the cells that contain return values
+                for (let j = 2; j < cells.length; j++) {
+                    const cell = cells[j];
+                    let cellValue = cell.textContent || cell.innerText;
+                    // Remove percentage sign and any whitespace
+                    cellValue = cellValue.replace('%', '').trim();
+                    // Convert to float
+                    const value = parseFloat(cellValue);
+                    // Check if value is a number
+                    if (!isNaN(value)) {
+                        if (value > 0) {
+                            cell.classList.add('positive-value');
+                        } else if (value < 0) {
+                            cell.classList.add('negative-value');
+                        }
+                    }
+                }
+            }
+        });
+        </script>
+        
     {% block scripts %}{% endblock %}
 </body>
 </html>

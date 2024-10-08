@@ -69,6 +69,15 @@ nav ul li a {
     color: #333; /* Dark gray text on hover */
     border: 1px solid #333; /* Keep the border */
 }
+.positive-value {
+    color: #28a745; /* Green color for positive returns */
+    font-weight: bold;
+}
+
+.negative-value {
+    color: #dc3545; /* Red color for negative returns */
+    font-weight: bold;
+}
 
 #filterInput {
     width: 100%;
