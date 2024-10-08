@@ -37,12 +37,11 @@
     <script src="/assets/js/script.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Get all table cells in the returns columns (assuming they are the 3rd to 10th columns)
+        function applyColoring() {
             const table = document.getElementById('fundTable');
             const rows = table.getElementsByTagName('tr');
         
-            // Loop through each row (skip the header row)
+            // Start from i = 1 to skip the header row
             for (let i = 1; i < rows.length; i++) {
                 const cells = rows[i].getElementsByTagName('td');
                 // Loop through the cells that contain return values
@@ -55,6 +54,8 @@
                     const value = parseFloat(cellValue);
                     // Check if value is a number
                     if (!isNaN(value)) {
+                        // Remove any existing classes to prevent duplication
+                        cell.classList.remove('positive-value', 'negative-value');
                         if (value > 0) {
                             cell.classList.add('positive-value');
                         } else if (value < 0) {
@@ -63,9 +64,14 @@
                     }
                 }
             }
+        }
+        
+        // Apply coloring on initial page load
+        document.addEventListener("DOMContentLoaded", function() {
+            applyColoring();
         });
         </script>
-        
+
     {% block scripts %}{% endblock %}
 </body>
 </html>

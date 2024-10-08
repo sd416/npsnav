@@ -32,6 +32,39 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             showAllButton.style.display = 'none';
         }
+
+        // Apply coloring to the displayed rows
+        applyColoring();
+    }
+
+    // Function to apply coloring to return value cells
+    function applyColoring() {
+        // Get all the rows in the table body
+        const displayedRows = fundTable.querySelectorAll('tr');
+
+        displayedRows.forEach(row => {
+            const cells = row.getElementsByTagName('td');
+
+            // Loop through the cells that contain return values
+            for (let j = 2; j < cells.length; j++) {
+                const cell = cells[j];
+                let cellValue = cell.textContent || cell.innerText;
+                // Remove percentage sign and any whitespace
+                cellValue = cellValue.replace('%', '').trim();
+                // Convert to float
+                const value = parseFloat(cellValue);
+                // Check if value is a number
+                if (!isNaN(value)) {
+                    // Remove existing classes to prevent duplication
+                    cell.classList.remove('positive-value', 'negative-value');
+                    if (value > 0) {
+                        cell.classList.add('positive-value');
+                    } else if (value < 0) {
+                        cell.classList.add('negative-value');
+                    }
+                }
+            }
+        });
     }
 
     // Function to sort table
@@ -45,8 +78,8 @@ document.addEventListener("DOMContentLoaded", function() {
             if (bText === '-') bText = ascending ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
 
             if (isNumeric) {
-                aText = parseFloat(aText);
-                bText = parseFloat(bText);
+                aText = parseFloat(aText.replace('%', '').trim());
+                bText = parseFloat(bText.replace('%', '').trim());
                 return ascending ? aText - bText : bText - aText;
             } else {
                 return ascending ? aText.localeCompare(bText) : bText.localeCompare(aText);
