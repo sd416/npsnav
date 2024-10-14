@@ -92,6 +92,34 @@ th, td {
     white-space: nowrap;
 }
 
+/* Positive values */
+td.positive {
+    color: green;
+  }
+  
+  /* Negative values */
+  td.negative {
+    color: red;
+  }
+  
+  /* Zero values */
+  td.zero {
+    color: gray;
+  }
+  
+  /* Null or unspecified values */
+  td.null {
+    color: gray;
+  }
+  
+  td.negative::before {
+    content: '▼ ';
+  }
+  
+  td.positive::before {
+    content: '▲ ';
+  }
+
 th {
     font-weight: bold;
     background-color: #f5f5f5;
