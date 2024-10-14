@@ -94,24 +94,24 @@ th, td {
 
 /* Positive values */
 td.positive {
-    color: green;
+    color: #16A085;
   }
   
   /* Negative values */
   td.negative {
-    color: red;
+    color: #E74C3C;
   }
   
   /* Zero values */
   td.zero {
     color: black;
   }
-  
-  /* Null or unspecified values */
+
   td.null {
     color: gray;
   }
-  
+/* Tried adding this but this does not look good. Keeping it for future reference 
+
   td.negative::before {
     content: '▼ ';
   }
@@ -120,6 +120,11 @@ td.positive {
     content: '▲ ';
   }
 
+td.zero::before {
+    content: '• ';
+  }
+
+ */ 
 th {
     font-weight: bold;
     background-color: #f5f5f5;
