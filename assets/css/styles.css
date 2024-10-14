@@ -104,7 +104,7 @@ td.positive {
   
   /* Zero values */
   td.zero {
-    color: gray;
+    color: black;
   }
   
   /* Null or unspecified values */
