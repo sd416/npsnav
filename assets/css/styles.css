@@ -109,7 +109,9 @@ tbody tr td:first-child {
     color: #333;
 }
 
-
+table tr td:nth-child(2)::before {
+    content: '₹';
+  }
 
 .last-updated {
     margin-top: 1rem;
