@@ -76,6 +76,7 @@ nav ul li a {
     max-width: 100%;
     margin: 0 auto;
     overflow-x: auto;
+    content: " ₹";
 }
 
 table {
@@ -107,6 +108,8 @@ tbody tr td:first-child {
     font-weight: bold;
     color: #333;
 }
+
+
 
 .last-updated {
     margin-top: 1rem;
