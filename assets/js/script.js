@@ -9,15 +9,23 @@ document.addEventListener("DOMContentLoaded", function() {
     let allFundsShown = false;
     let filterText = ''; // Variable to store the filter text
 
+    // Function to perform fuzzy matching
+    function fuzzyMatch(str, pattern) {
+        // Escape special regex characters in pattern
+        pattern = pattern.split("").map(char => char.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')).join('.*');
+        const regex = new RegExp(pattern, 'i'); // 'i' for case-insensitive
+        return regex.test(str);
+    }
+
     // Function to render the table based on the number of funds to show and filter text
     function renderTable() {
         // Clear the table first
         fundTable.innerHTML = '';
 
-        // Filter rows based on the filter text
+        // Filter rows based on the filter text using fuzzy matching
         const filteredRows = rows.filter(row => {
-            const fundName = row.cells[0].innerText.toLowerCase();
-            return fundName.includes(filterText.toLowerCase());
+            const fundName = row.cells[0].innerText;
+            return fuzzyMatch(fundName, filterText);
         });
 
         // Get the rows to display
