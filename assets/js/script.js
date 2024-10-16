@@ -5,47 +5,26 @@ document.addEventListener("DOMContentLoaded", function() {
     const filterInput = document.getElementById("filterInput");
     let rows = Array.from(fundTable.rows);
 
-    let numFundsToShow = 10; // Variable for home page table pagination
+    let numFundsToShow = 10; // Number of funds to show initially
     let allFundsShown = false;
     let filterText = ''; // Variable to store the filter text
 
-    // Function to calculate Levenshtein distance
-    function levenshteinDistance(a, b) {
-        const an = a.length;
-        const bn = b.length;
-        if (an === 0) return bn;
-        if (bn === 0) return an;
+    // Simple fuzzy match function
+    function fuzzyMatch(fundName, filterText) {
+        fundName = fundName.toLowerCase();
+        filterText = filterText.toLowerCase();
 
-        const matrix = [];
+        let fundIndex = 0;
+        let filterIndex = 0;
 
-        // Initialize the first row and column of the matrix
-        for (let i = 0; i <= an; i++) {
-            matrix[i] = [i];
-        }
-        for (let j = 0; j <= bn; j++) {
-            matrix[0][j] = j;
-        }
-
-        // Fill the matrix
-        for (let i = 1; i <= an; i++) {
-            for (let j = 1; j <= bn; j++) {
-                const cost = a.charAt(i - 1).toLowerCase() === b.charAt(j - 1).toLowerCase() ? 0 : 1;
-                matrix[i][j] = Math.min(
-                    matrix[i - 1][j] + 1,      // Deletion
-                    matrix[i][j - 1] + 1,      // Insertion
-                    matrix[i - 1][j - 1] + cost // Substitution
-                );
+        while (fundIndex < fundName.length && filterIndex < filterText.length) {
+            if (fundName[fundIndex] === filterText[filterIndex]) {
+                filterIndex++;
             }
+            fundIndex++;
         }
-        return matrix[an][bn];
-    }
 
-    // Function to calculate similarity score
-    function getSimilarity(a, b) {
-        const maxLen = Math.max(a.length, b.length);
-        if (maxLen === 0) return 1; // Both strings are empty
-        const distance = levenshteinDistance(a, b);
-        return (maxLen - distance) / maxLen;
+        return filterIndex === filterText.length;
     }
 
     // Function to render the table based on the number of funds to show and filter text
@@ -53,26 +32,15 @@ document.addEventListener("DOMContentLoaded", function() {
         // Clear the table first
         fundTable.innerHTML = '';
 
-        // Filter and sort rows based on the similarity score
-        let filteredRows = rows.map(row => {
+        // Filter rows based on the filter text using simple fuzzy matching
+        const filteredRows = rows.filter(row => {
             const fundName = row.cells[0].innerText.trim();
-            let similarity = 0;
-
             if (filterText.trim() === '') {
-                similarity = 1; // Maximum similarity when there's no filter
+                return true; // Include all rows when no filter
             } else {
-                similarity = getSimilarity(fundName, filterText.trim());
+                return fuzzyMatch(fundName, filterText.trim());
             }
-
-            return { row, similarity };
         });
-
-        // Filter out rows below a certain similarity threshold
-        const threshold = 0.4; // Adjust this value as needed
-        filteredRows = filteredRows.filter(item => item.similarity >= threshold);
-
-        // Sort the filtered rows by similarity score in descending order
-        filteredRows.sort((a, b) => b.similarity - a.similarity);
 
         // Get the rows to display
         const rowsToDisplay = allFundsShown
@@ -80,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
             : filteredRows.slice(0, numFundsToShow);
 
         // Append the rows to the table
-        rowsToDisplay.forEach(item => fundTable.appendChild(item.row));
+        rowsToDisplay.forEach(row => fundTable.appendChild(row));
 
         // Toggle the "Show All" button visibility
         if (filteredRows.length > numFundsToShow && !allFundsShown) {
@@ -144,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Default sort by 5Y column (index 9) in descending order
-    const fiveYearHeader = headers[9]; // 5Y column
+    const fiveYearHeader = headers[9]; // Adjust the index if needed
     fiveYearHeader.classList.add("sorted-desc");
     sortTable(9, true, false);
 
