@@ -13,18 +13,23 @@ document.addEventListener("DOMContentLoaded", function() {
     function levenshteinDistance(a, b) {
         const an = a.length;
         const bn = b.length;
-        const matrix = Array.from({ length: an + 1 }, () => Array(bn + 1).fill(0));
+        if (an === 0) return bn;
+        if (bn === 0) return an;
 
+        const matrix = [];
+
+        // Initialize the first row and column of the matrix
         for (let i = 0; i <= an; i++) {
-            matrix[i][0] = i;
+            matrix[i] = [i];
         }
         for (let j = 0; j <= bn; j++) {
             matrix[0][j] = j;
         }
 
+        // Fill the matrix
         for (let i = 1; i <= an; i++) {
             for (let j = 1; j <= bn; j++) {
-                const cost = a[i - 1].toLowerCase() === b[j - 1].toLowerCase() ? 0 : 1;
+                const cost = a.charAt(i - 1).toLowerCase() === b.charAt(j - 1).toLowerCase() ? 0 : 1;
                 matrix[i][j] = Math.min(
                     matrix[i - 1][j] + 1,      // Deletion
                     matrix[i][j - 1] + 1,      // Insertion
@@ -37,8 +42,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Function to calculate similarity score
     function getSimilarity(a, b) {
-        const distance = levenshteinDistance(a, b);
         const maxLen = Math.max(a.length, b.length);
+        if (maxLen === 0) return 1; // Both strings are empty
+        const distance = levenshteinDistance(a, b);
         return (maxLen - distance) / maxLen;
     }
 
@@ -55,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (filterText.trim() === '') {
                 similarity = 1; // Maximum similarity when there's no filter
             } else {
-                similarity = getSimilarity(filterText.trim(), fundName);
+                similarity = getSimilarity(fundName, filterText.trim());
             }
 
             return { row, similarity };
