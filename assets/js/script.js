@@ -9,6 +9,9 @@ document.addEventListener("DOMContentLoaded", function() {
     let allFundsShown = false;
     let filterText = ''; // Variable to store the filter text
 
+    // List of priority words
+    const priorityWords = ['HDFC', 'LIC', 'AXIS', 'BIRLA', 'ADITYA', 'UTI', 'ICICI', 'TATA', 'MAX', 'KOTAK'];
+
     // Simple fuzzy match function
     function fuzzyMatch(fundName, filterText) {
         fundName = fundName.toLowerCase();
@@ -32,8 +35,14 @@ document.addEventListener("DOMContentLoaded", function() {
         // Clear the table first
         fundTable.innerHTML = '';
 
-        // Filter rows based on the filter text using simple fuzzy matching
-        const filteredRows = rows.filter(row => {
+        // First, filter rows based on the priority words
+        const priorityFilteredRows = rows.filter(row => {
+            const fundName = row.cells[0].innerText.trim().toUpperCase();
+            return priorityWords.some(word => fundName.includes(word));
+        });
+
+        // Then, filter rows based on the filter text using simple fuzzy matching
+        const filteredRows = priorityFilteredRows.filter(row => {
             const fundName = row.cells[0].innerText.trim();
             if (filterText.trim() === '') {
                 return true; // Include all rows when no filter
@@ -55,6 +64,17 @@ document.addEventListener("DOMContentLoaded", function() {
             showAllButton.style.display = 'block';
         } else {
             showAllButton.style.display = 'none';
+        }
+
+        // If no rows match, display a message
+        if (filteredRows.length === 0) {
+            const noResultsRow = document.createElement('tr');
+            const noResultsCell = document.createElement('td');
+            noResultsCell.colSpan = headers.length;
+            noResultsCell.textContent = 'No matching funds found.';
+            noResultsCell.style.textAlign = 'center';
+            noResultsRow.appendChild(noResultsCell);
+            fundTable.appendChild(noResultsRow);
         }
     }
 
