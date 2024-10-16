@@ -35,21 +35,40 @@ document.addEventListener("DOMContentLoaded", function() {
         // Clear the table first
         fundTable.innerHTML = '';
 
-        // First, filter rows based on the priority words
-        const priorityFilteredRows = rows.filter(row => {
-            const fundName = row.cells[0].innerText.trim().toUpperCase();
-            return priorityWords.some(word => fundName.includes(word));
-        });
+        // Trim and uppercase the filter text
+        const trimmedFilterText = filterText.trim().toUpperCase();
 
-        // Then, filter rows based on the filter text using simple fuzzy matching
-        const filteredRows = priorityFilteredRows.filter(row => {
-            const fundName = row.cells[0].innerText.trim();
-            if (filterText.trim() === '') {
-                return true; // Include all rows when no filter
-            } else {
+        // Check if the filter text matches any priority word
+        const matchedPriorityWords = priorityWords.filter(word => word.includes(trimmedFilterText));
+
+        let filteredRows;
+
+        if (trimmedFilterText === '') {
+            // No filter text; display funds containing any priority word
+            filteredRows = rows.filter(row => {
+                const fundName = row.cells[0].innerText.trim().toUpperCase();
+                return priorityWords.some(word => fundName.includes(word));
+            });
+        } else if (matchedPriorityWords.length > 0) {
+            // Filter funds containing the matched priority word(s)
+            filteredRows = rows.filter(row => {
+                const fundName = row.cells[0].innerText.trim().toUpperCase();
+                return matchedPriorityWords.some(word => fundName.includes(word));
+            }).filter(row => {
+                // Apply fuzzy search on the filtered funds
+                const fundName = row.cells[0].innerText.trim();
                 return fuzzyMatch(fundName, filterText.trim());
-            }
-        });
+            });
+        } else {
+            // If filter text doesn't match any priority word, apply fuzzy search to all priority funds
+            filteredRows = rows.filter(row => {
+                const fundName = row.cells[0].innerText.trim().toUpperCase();
+                return priorityWords.some(word => fundName.includes(word));
+            }).filter(row => {
+                const fundName = row.cells[0].innerText.trim();
+                return fuzzyMatch(fundName, filterText.trim());
+            });
+        }
 
         // Get the rows to display
         const rowsToDisplay = allFundsShown
