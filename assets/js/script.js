@@ -9,12 +9,37 @@ document.addEventListener("DOMContentLoaded", function() {
     let allFundsShown = false;
     let filterText = ''; // Variable to store the filter text
 
-    // Function to perform fuzzy matching
-    function fuzzyMatch(str, pattern) {
-        // Escape special regex characters in pattern
-        pattern = pattern.split("").map(char => char.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')).join('.*');
-        const regex = new RegExp(pattern, 'i'); // 'i' for case-insensitive
-        return regex.test(str);
+    // Function to calculate Levenshtein distance
+    function levenshteinDistance(a, b) {
+        const an = a.length;
+        const bn = b.length;
+        const matrix = Array.from({ length: an + 1 }, () => Array(bn + 1).fill(0));
+
+        for (let i = 0; i <= an; i++) {
+            matrix[i][0] = i;
+        }
+        for (let j = 0; j <= bn; j++) {
+            matrix[0][j] = j;
+        }
+
+        for (let i = 1; i <= an; i++) {
+            for (let j = 1; j <= bn; j++) {
+                const cost = a[i - 1].toLowerCase() === b[j - 1].toLowerCase() ? 0 : 1;
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j] + 1,      // Deletion
+                    matrix[i][j - 1] + 1,      // Insertion
+                    matrix[i - 1][j - 1] + cost // Substitution
+                );
+            }
+        }
+        return matrix[an][bn];
+    }
+
+    // Function to calculate similarity score
+    function getSimilarity(a, b) {
+        const distance = levenshteinDistance(a, b);
+        const maxLen = Math.max(a.length, b.length);
+        return (maxLen - distance) / maxLen;
     }
 
     // Function to render the table based on the number of funds to show and filter text
@@ -22,17 +47,34 @@ document.addEventListener("DOMContentLoaded", function() {
         // Clear the table first
         fundTable.innerHTML = '';
 
-        // Filter rows based on the filter text using fuzzy matching
-        const filteredRows = rows.filter(row => {
-            const fundName = row.cells[0].innerText;
-            return fuzzyMatch(fundName, filterText);
+        // Filter and sort rows based on the similarity score
+        let filteredRows = rows.map(row => {
+            const fundName = row.cells[0].innerText.trim();
+            let similarity = 0;
+
+            if (filterText.trim() === '') {
+                similarity = 1; // Maximum similarity when there's no filter
+            } else {
+                similarity = getSimilarity(filterText.trim(), fundName);
+            }
+
+            return { row, similarity };
         });
 
+        // Filter out rows below a certain similarity threshold
+        const threshold = 0.4; // Adjust this value as needed
+        filteredRows = filteredRows.filter(item => item.similarity >= threshold);
+
+        // Sort the filtered rows by similarity score in descending order
+        filteredRows.sort((a, b) => b.similarity - a.similarity);
+
         // Get the rows to display
-        const rowsToDisplay = allFundsShown ? filteredRows : filteredRows.slice(0, numFundsToShow);
+        const rowsToDisplay = allFundsShown
+            ? filteredRows
+            : filteredRows.slice(0, numFundsToShow);
 
         // Append the rows to the table
-        rowsToDisplay.forEach(row => fundTable.appendChild(row));
+        rowsToDisplay.forEach(item => fundTable.appendChild(item.row));
 
         // Toggle the "Show All" button visibility
         if (filteredRows.length > numFundsToShow && !allFundsShown) {
