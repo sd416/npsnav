@@ -1,6 +1,3 @@
-# Redirect for date API to serve .json files
-/api/date/:scheme_id/*   /api/date/:scheme_id/:splat.json   200
-
 # Redirect for detailed API to serve .json files
 /api/detailed/:scheme_id   /api/detailed/:scheme_id.json   200
 
