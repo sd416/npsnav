@@ -37,7 +37,7 @@ def create_folder_and_json(file_path, output_folder):
         # Write the new or updated data to the JSON file
         with open(json_file_path, 'w') as jf:
             json.dump({date: value}, jf, indent=4)
-        print(f"Created/Updated {json_file_name} in {folder_path}.")
+#        print(f"Created/Updated {json_file_name} in {folder_path}.")
 
 def process_folder(input_folder, output_folder):
     # List of files to exclude
